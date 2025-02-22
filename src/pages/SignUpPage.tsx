@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Shield } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../lib/supabase.ts';
 import toast from 'react-hot-toast';
 
 const SignUpPage = () => {
@@ -16,36 +16,33 @@ const SignUpPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
+    
     try {
       // Sign up the user
       const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
-        options: {
-          data: {
-            role: formData.role, // Store role in user metadata
-          },
-        },
       });
+
+      console.log(authData, signUpError);
+      
 
       if (signUpError) throw signUpError;
 
       if (authData.user) {
         // Create profile with the selected role
         const { error: profileError } = await supabase
-  .from('profiles')
-  .upsert([
-    {
-      id: authData.user.id, 
-      role: formData.role,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    }
-  ]); // No need for { upsert: true }
+          .from('profiles')
+          .upsert([
+            {
+              id: authData.user.id,
+              role: formData.role,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            }
+          ]);
 
         if (profileError) {
-          console.error('Profile creation error:', profileError);
           throw new Error('Failed to create user profile');
         }
 
@@ -54,9 +51,22 @@ const SignUpPage = () => {
       }
     } catch (error: any) {
       toast.error(error.message);
-      console.error('Signup error:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+      });
+
+      if (error) {
+        throw error;
+      }
+    } catch (error: any) {
+      toast.error('Google Sign-In failed.');
     }
   };
 
@@ -122,6 +132,24 @@ const SignUpPage = () => {
             </button>
           </div>
         </form>
+
+        <div className="flex items-center justify-center">
+          <hr className="w-1/3 border-gray-300" />
+          <span className="px-3 text-gray-500 text-sm">or</span>
+          <hr className="w-1/3 border-gray-300" />
+        </div>
+
+        <button
+          onClick={handleGoogleSignIn}
+          className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-100"
+        >
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png"
+            alt="Google"
+            className="h-5 w-5 mr-2"
+          />
+          Sign in with Google
+        </button>
       </div>
     </div>
   );
