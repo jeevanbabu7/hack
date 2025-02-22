@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Shield } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import toast from 'react-hot-toast';
+import { useAuth } from '../contexts/AuthContext';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -11,41 +12,75 @@ const LoginPage = () => {
     password: '',
   });
   const [loading, setLoading] = useState(false);
-
+  const { signIn } = useAuth();
+  const users = [
+    { id: "123",
+      email: 'jeevan@gmail.com',
+      password: 'qwerty',
+      role: 'user',
+    },
+    { id: "456",
+      email: 'bijil@gmail.com',
+      password: 'qwerty',
+      role: 'manager',
+    }
+  ];
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    // setLoading(true);
 
-    try {
-      const { data: { user }, error: signInError } = await supabase.auth.signInWithPassword({
-        email: formData.email,
-        password: formData.password,
-      });
+    // try {
+    //   const { data: { user }, error: signInError } = await supabase.auth.signInWithPassword({
+    //     email: formData.email,
+    //     password: formData.password,
+    //   });
 
-      if (signInError) throw signInError;
+    //   if (signInError) throw signInError;
 
-      if (user) {
-        // Fetch the user's role
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', user.id)
-          .limit(1)
-          .single();
+    //   if (user) {
+    //     // Fetch the user's role
+    //     const { data: profile, error: profileError } = await supabase
+    //       .from('profiles')
+    //       .select('role')
+    //       .eq('id', user.id)
+    //       .limit(1)
+    //       .single();
 
-        if (profileError) {
-          console.error('Error fetching profile:', profileError);
-          throw new Error('Failed to fetch user profile');
-        }
+    //     if (profileError) {
+    //       console.error('Error fetching profile:', profileError);
+    //       throw new Error('Failed to fetch user profile');
+    //     }
 
-        if (!profile) {
-          throw new Error('User profile not found');
-        }
+    //     if (!profile) {
+    //       throw new Error('User profile not found');
+    //     }
 
-        toast.success('Login successful!');
+    //     toast.success('Login successful!');
         
-        // Redirect based on user role
-        switch (profile.role) {
+    //     // Redirect based on user role
+    //     switch (profile.role) {
+    //       case 'admin':
+    //         navigate('/dashboard/admin');
+    //         break;
+    //       case 'manager':
+    //         navigate('/dashboard/manager');
+    //         break;
+    //       default:
+    //         navigate('/dashboard/user');
+    //     }
+    //   }
+    // } catch (error: any) {
+    //   toast.error(error.message);
+    //   console.error('Login error:', error);
+    // } finally {
+    //   setLoading(false);
+    // }
+
+    users.forEach((user) => {
+      if (user.email === formData.email) {
+        toast.success('Login successful!');
+        signIn({ id: user.id, role: user.role });
+        switch (user.role) {
           case 'admin':
             navigate('/dashboard/admin');
             break;
@@ -54,14 +89,12 @@ const LoginPage = () => {
             break;
           default:
             navigate('/dashboard/user');
+            break
         }
       }
-    } catch (error: any) {
-      toast.error(error.message);
-      console.error('Login error:', error);
-    } finally {
-      setLoading(false);
-    }
+    });
+
+
   };
 
   return (

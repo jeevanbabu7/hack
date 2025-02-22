@@ -1,9 +1,11 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Palette } from 'lucide-react';
-
+import { useAuth } from '../contexts/AuthContext';
+import { Outlet } from 'react-router-dom';
 export function Navbar() {
   const location = useLocation();
+  const {user} = useAuth();
 
   const scrollToSection = (sectionId: string) => {
     // Only scroll if we're on the home page
@@ -19,6 +21,7 @@ export function Navbar() {
   };
 
   return (
+    <>
     <nav className="bg-white shadow-md fixed w-full z-10">
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
@@ -56,23 +59,27 @@ export function Navbar() {
             </button>
 
             {/* Auth Buttons */}
-            <div className="flex space-x-4">
-              <Link
-                to="/login"
-                className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors duration-300"
-              >
-                Login
-              </Link>
-              <Link
-                to="/signup"
-                className="px-4 py-2 border border-purple-600 text-purple-600 rounded-md hover:bg-purple-600 hover:text-white transition-colors duration-300"
-              >
-                Signup
-              </Link>
-            </div>
+            {!user && (
+              <div className="flex space-x-4">
+                <Link
+                  to="/login"
+                  className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors duration-300"
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/signup"
+                  className="px-4 py-2 border border-purple-600 text-purple-600 rounded-md hover:bg-purple-600 hover:text-white transition-colors duration-300"
+                >
+                  Signup
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </div>
     </nav>
+    <Outlet />
+    </>
   );
 }

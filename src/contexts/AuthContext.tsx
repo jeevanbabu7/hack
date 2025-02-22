@@ -1,85 +1,63 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User } from '@supabase/supabase-js';
-import { supabase } from '../lib/supabase';
 
 interface AuthContextType {
-  user: User | null;
+  user: string | null;
   userRole: string | null;
   loading: boolean;
-  signOut: () => Promise<void>;
+  signIn: (user: UserType) => void;
+  signOut: () => void;
+}
+
+interface UserType {
+  id: string;
+  role: string;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   userRole: null,
-  loading: true,
-  signOut: async () => {},
+  loading: false,
+  signIn: () => {},
+  signOut: () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-  const fetchUserRole = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', userId)
-        .maybeSingle();
-
-      if (error) {
-        console.error('Error fetching user role:', error);
-        return;
-      }
-
-      setUserRole(data?.role ?? null);
-    } catch (error) {
-      console.error('Error in fetchUserRole:', error);
-    }
-  };
-
+  // Simulating a stored session (e.g., from localStorage)
   useEffect(() => {
-    // Initial session check
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchUserRole(session.user.id);
-      }
-      setLoading(false);
-    });
+    setLoading(true);
+    const storedUser = localStorage.getItem('user');
+    const storedRole = localStorage.getItem('userRole');
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        await fetchUserRole(session.user.id);
-      } else {
-        setUserRole(null);
-      }
-      setLoading(false);
-    });
+    if (storedUser && storedRole) {
+      setUser(storedUser);
+      setUserRole(storedRole);
+    }
 
-    return () => {
-      subscription.unsubscribe();
-    };
+    setLoading(false);
   }, []);
 
-  const signOut = async () => {
-    try {
-      await supabase.auth.signOut();
-      setUser(null);
-      setUserRole(null);
-    } catch (error) {
-      console.error('Error signing out:', error);
-    }
+  const signIn = (user: UserType) => {
+    setUser(user.id);
+    setUserRole(user.role);
+    localStorage.setItem('user', user.id);
+    localStorage.setItem('userRole', user.role);
+  };
+
+  const signOut = () => {
+    setUser(null);
+    setUserRole(null);
+    localStorage.removeItem('user');
+    localStorage.removeItem('userRole');
   };
 
   return (
-    <AuthContext.Provider value={{ user, userRole, loading, signOut }}>
+    <AuthContext.Provider value={{ user, userRole, loading, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );

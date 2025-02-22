@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Brush, Camera, PenTool, Image, Frame, Layers, Scissors, Palette } from 'lucide-react';
-
+import { useAuth } from '../contexts/AuthContext';
 export function Home() {
   const [currentImage, setCurrentImage] = useState(0);
+  
+  const { user } = useAuth();
   
   const images = [
     "https://images.pexels.com/photos/3735762/pexels-photo-3735762.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
@@ -72,7 +74,7 @@ export function Home() {
       </section>
 
       {/* Services Section */}
-      <section id="services" className="py-20">
+      {/* <section id="services" className="py-20">
         <div className="container mx-auto px-6">
           <h2 className="text-4xl font-bold text-center mb-12 text-gray-800">Our Services</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -89,7 +91,7 @@ export function Home() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Contact Section */}
       <section id="contact" className="py-20 bg-gray-50">
