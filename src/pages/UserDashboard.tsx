@@ -16,7 +16,7 @@ const UserDashboard = () => {
     { id: 'components', icon: <PenTool size={24} />, title: "Buy Components", description: "Buy refurbished electronic components for a better price" },
     { id: 'upcycling', icon: <Image size={24} />, title: "DIY Decors", description: "DIY Upcycling with ai and a marrket place to by decors" },
     { id: 'student-service', icon: <Frame size={24} />, title: "Budget friendly Repair", description: "Technical Professional students offers affordable repairing services " },
-    { id: 'dispose-Hazzard', icon: <Layers size={24} />, title: "Hazard waste Disposal", description: "service offered by certified recyclers and their door step pick up service" },
+    { id: 'dispose-hazard', icon: <Layers size={24} />, title: "Hazard waste Disposal", description: "service offered by certified recyclers and their door step pick up service" },
     { id: 'Buy-used-products', icon: <Scissors size={24} />, title: "Buy used Electroni products", description: "An E-commerce Facility to purchase used electronics products near you" }
   ];  
   return (
