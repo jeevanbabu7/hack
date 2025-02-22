@@ -45,7 +45,7 @@ function App() {
     <AuthProvider>
       <Routes>
         {/* Wrap everything in a Layout that includes Navbar */}
-        <Route element={<Layout />}>
+        <Route element={<Navbar />}>
           <Route path="/" element={<Home />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/login" element={<LoginPage />} />
@@ -99,12 +99,12 @@ function App() {
           />
 
           {/* Services Section */}
-          <Route path="/services" element={<Components />}>
-            <Route path='components' element={<PhotoList />} /> {/* Default route when visiting /services */}
-            <Route path="upload" element={<UploadForm />} />
-            <Route path="photo/:id" element={<PhotoDetail />} />
-            <Route path="cart" element={<Cart />} />
-          </Route>
+          <Route path="/services/components" element={<Components />}/>
+            
+            <Route path="/services/upload" element={<UploadForm />} />
+            <Route path="/services/photo/:id" element={<PhotoDetail />} />
+            <Route path="/services/cart" element={<Cart />} />
+         
 
           {/* Catch-all for unknown routes */}
           <Route path="*" element={<Navigate to="/" replace />} />
